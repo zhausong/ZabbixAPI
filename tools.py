@@ -82,30 +82,6 @@ def host_disable(hostip):
     print host_get(hostip)
 
 def get_items_value(hostid='',item='',startime='',endtime=''):
-    #method": "item.get",
-    #"params": {
-    #    "output": "extend",
-    #    "hostids": "10084",
-    #    "search": {
-    #        "key_": "system"
-    #    },
-    #    "sortfield": "name"
-    #},
-    #Possible values:
-    #0 - float;
-    #1 - string;
-    #2 - log;
-    #3 - integer;
-    #4 - text.
-
-    #    "params": {"output": "extend","history": 0,
-    #    "itemids": itemid,
-    #    "sortfield": "clock",
-    #    "sortorder": "DESC",
-    #    "limit": 10
-    #}
-    #itemid=zabbix.APIobjectMethod(method='item.get',params={"output":"extend","hostids":hostid,"search":{"key_":item},"sortfileld":"name"})
-    #hostname=zabbix.APIobjectMethod(method='host.get',params={"output":"extend","filter":{"host":hostname}})
     #时间转时间戳
     startime=int(time.mktime(time.strptime(startime,'%Y-%m-%d %H:%M:%S')))
     endtime=int(time.mktime(time.strptime(endtime,'%Y-%m-%d %H:%M:%S')))
@@ -125,8 +101,6 @@ def get_items_value(hostid='',item='',startime='',endtime=''):
     else:
         print "item is Error"
     #    return 'Error'
-    #history_value=zabbix.APIobjectMethod(method='history.get',params={"output": "extend","history": item_type,"itemids": itemid,"time_from":startime,"time_till":endtime,"sortfield": "clock","sortorder": "DESC"})
-    #print "zabbix.APIobjectMethod(method='history.get',params={'output': 'extend','history':%s ,'itemids':%s ,'time_from':%s,'time_till':%s,'sortfield': 'clock','sortorder': 'DESC'})"%(item_type,itemid,startime,endtime)
     history_value=zabbix.APIobjectMethod(method='history.get',params={"output": "extend","history": item_type,"itemids": itemid,"time_from":startime,"time_till":endtime,"sortfield": "clock","sortorder": "DESC"})
     if type(history_value) is not list:
         print 'Error'
@@ -178,8 +152,8 @@ def get_group_items_value(groupname='',item='',startime='',endtime=''):
     for k in host_item_value_list:
         avg_list.append(float(k['AVG']))
     MAX=sum(max_list)/len(max_list)
-    MIN=sum(max_list)/len(min_list)
-    AVG=sum(max_list)/len(avg_list)
+    MIN=sum(min_list)/len(min_list)
+    AVG=sum(avg_list)/len(avg_list)
 
     #print "MAX:  %s\tMIN:   %s\tAVG:    %s"%(MAX,MIN,AVG)
     print {"HOSTGROUP":groupname,"ITEMNAME":item,"MAX":MAX,"MIN":MIN,"AVG":AVG}
