@@ -83,7 +83,7 @@ class ZabbixAPI:
             if not response['result']:
                 print "logout failed"
 
-    def APIobjectMethod(self,method='host.get',params={"output":"extend"},auth_code=''):
+    def APIobjectMethod(self,method='host.get',params={"output":"extend"}):
         json_data={
                 "method" : method, 
                 "params" : params
