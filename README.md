@@ -27,7 +27,9 @@ zbx.APIobjectMethod()
     "id": 1
 }
 ```
-则zbx.APIobjectMethod(method='host.get',"params": {
+则
+```
+zbx.APIobjectMethod(method='host.get',"params": {
         "output": "extend",
         "history": 0,
         "itemids": "23296",
@@ -35,7 +37,9 @@ zbx.APIobjectMethod()
         "sortorder": "DESC",
         "limit": 10
     }
-}为其调用方法
+}
+```
+为其调用方法
 
 #二、tools.py是一个基于ZabbixAPI的例子
 ##1.功能:
