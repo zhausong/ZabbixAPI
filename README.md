@@ -1,14 +1,16 @@
 ## ZabbixAPI是Zabbix的python实现版本
 #一、ZabbixAPI的用法
 ```
-zbx=ZabbixAPI.ZabbixAPI()
+python>import ZabbixAPI
+python>zbx=ZabbixAPI.ZabbixAPI()
+#提供三个方法
 zbx.login()           
 zbx.logout()
 zbx.APIobjectMethod() 
+
 #zbx.APIobjectMethod(method='host.get', params={'output': 'extend'})
 ```
-如history.get的官方例子用法如下
-见https://www.zabbix.com/documentation/2.2/manual/api/reference/history/get
+如history.get的官方例子用法如下,链接见https://www.zabbix.com/documentation/2.2/manual/api/reference/history/get
 ```
 {
     "jsonrpc": "2.0",
