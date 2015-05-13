@@ -27,9 +27,9 @@ zbx.APIobjectMethod()
     "id": 1
 }
 ```
-则
+则history.get的调用方法如下:
 ```
-zbx.APIobjectMethod(method='host.get',"params": {
+zbx.APIobjectMethod(method='history.get',"params": {
         "output": "extend",
         "history": 0,
         "itemids": "23296",
@@ -39,7 +39,6 @@ zbx.APIobjectMethod(method='host.get',"params": {
     }
 }
 ```
-为其调用方法
 
 #二、tools.py是一个基于ZabbixAPI的例子
 ##1.功能:
