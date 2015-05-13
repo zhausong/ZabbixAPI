@@ -22,8 +22,6 @@ class ZabbixAPI:
 #        self.auth_code     = ""
 
     def login(self):
-        #global auth_code
-        #print zabbix_user
         params = json.dumps(
                 {
                     "jsonrpc":"2.0",
@@ -32,7 +30,6 @@ class ZabbixAPI:
                             {
                                 "user": self.zabbix_user,
                                 "password": self.zabbix_pass,
-                                #"userData": True
                             },
                     "id":0
         })
@@ -61,7 +58,6 @@ class ZabbixAPI:
                     ret=self.auth_code
         #已登录的不再执行登录
         else:
-            #print self.check_auth
             ret=self.auth_code
         return ret
 
@@ -77,8 +73,6 @@ class ZabbixAPI:
                 "id": 1,
                 "auth": self.login()
             })
-        #print self.login()
-        #print "I'm  logout"
         try:
             request_zabbix = requests.post(self.zabbix_url, data=auth_data, headers=self.zabbix_header,timeout=5)
         except Exception as e:
@@ -86,22 +80,16 @@ class ZabbixAPI:
         else:
             response = request_zabbix.json()
             request_zabbix.close()
-            #if  response['result']:
-            #    print "logout sucessed"
-            #else:
             if not response['result']:
                 print "logout failed"
 
     def APIobjectMethod(self,method='host.get',params={"output":"extend"},auth_code=''):
         json_data={
-                #"method":"host.get",
                 "method" : method, 
-                #"params":{"output":"extend"}
                 "params" : params
         }
         json_base={
                 "jsonrpc":"2.0",
-                #"auth": self.login(),
                 "auth": self.login(),
                 "id":1
         }
@@ -119,18 +107,7 @@ class ZabbixAPI:
                 ret=response['result']
                 if len(ret) != 0:
                     return ret
-                    #if type(ret) is list:
-                    #    #print ret
-                    #    return ret[0]
-                    #elif type(ret) is dict:
-                    #    return ret
                 elif len(ret) == 0:
                     return 'error'
             elif 'error' in response:
                 print response['error']
-
-#if __name__ == '__main__':
-#    zabbix=ZabbixAPI()
-    #zabbix.login()
-#    zabbix.APIobjectMethod(method='host.get',params={"output":"extend"})
-    #zabbix.logout()
