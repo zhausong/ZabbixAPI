@@ -11,7 +11,7 @@
  python tools.py查看帮助 
  
 ##3.配置用户名、密码：
-    修改ZabbixAPI.py如下
+修改ZabbixAPI.py如下
 ```
 self.zabbix_url    = "http://localhost/api_jsonrpc.php"
 self.zabbix_user   = "Admin" 
