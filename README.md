@@ -13,7 +13,7 @@
 ##3.配置用户名、密码：
     修改ZabbixAPI.py如下
 ```
-        self.zabbix_url = "http://localhost/api_jsonrpc.php"
-        self.zabbix_user   = "Admin" 
-        self.zabbix_pass   = "zabbix"
+self.zabbix_url    = "http://localhost/api_jsonrpc.php"
+self.zabbix_user   = "Admin" 
+self.zabbix_pass   = "zabbix"
 ```
