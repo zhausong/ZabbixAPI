@@ -82,7 +82,7 @@ def hostgroup_create(hostgroupName=''):
     group=zabbix.APIobjectMethod(method='hostgroup.get',params={"output": "extend", "filter": { "name": hostgroupName }})
     if type(group) is list:
         if 'groupid' in group[0]:
-            print "hostgroupName:\t %s exist,GroupID:\t %s"%(hostgroupName,group[0]['groupid']) 
+            print "hostgroupName:\t %s exist,GroupID:\t %s"%(hostgroupName,group['groupid']) 
     if group == 'error':
         ret=zabbix.APIobjectMethod(method="hostgroup.create",params={"name":hostgroupName}) #
         groupid=int(ret['groupids'][0])
