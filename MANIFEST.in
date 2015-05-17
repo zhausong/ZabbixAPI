@@ -1,0 +1,2 @@
+#recursive-include ZabbixAPI *.py
+include ZabbixAPI.py
