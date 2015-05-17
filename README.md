@@ -1,6 +1,10 @@
 ## ZabbixAPI是Zabbix的python实现版本
 #一、ZabbixAPI的用法
 ```
+shell#git clone https://github.com/itnihao/ZabbixAPI.git
+shell#cd ZabbixAPI
+shell#sudo python setup.py install
+
 python>import ZabbixAPI
 python>zbx=ZabbixAPI.ZabbixAPI()
 #提供三个方法
@@ -40,7 +44,7 @@ zbx.APIobjectMethod(method='history.get',"params": {
 }
 ```
 
-#二、tools.py是一个基于ZabbixAPI的例子
+#二、zbx_tool是一个基于ZabbixAPI的例子
 ##1.功能:
 ```
     1.查询主机 主机组 模板 
@@ -50,7 +54,7 @@ zbx.APIobjectMethod(method='history.get',"params": {
 ```
 
 ##2.用法
- python tools.py查看帮助 
+ zbx_tool --help查看帮助 
  
 ##3.配置用户名、密码：
 修改ZabbixAPI.py如下
