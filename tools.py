@@ -12,7 +12,6 @@ except:
 
 
 zabbix = ZabbixAPI.ZabbixAPI()
-auth_code=zabbix.login()
 
 def host_get(hostname=''): 
     host=zabbix.APIobjectMethod(method='host.get',params={"output":"extend","filter":{"host":hostname}})
@@ -20,40 +19,64 @@ def host_get(hostname=''):
     available = {"0":"Unknown","1":"available","2":"Unavailable"}
     if host != 'error':
         host=host[0]
-        print "HostName: %s\t HostID: %s\t Status:\033[32m%s\033[0m \t Available:\033[31m%s\033[0m"%(host['hostid'],host['name'],status[host['status']],available[host['available']])
+        print "HostName: %s\t HostID: %s\t Status:\033[32m%s\033[0m \t Available:\033[31m%s\033[0m"%(host['name'],host['hostid'],status[host['status']],available[host['available']])
+        hostid=int(host['hostid'])
+        return hostid
     else:
         print "HostName: %s\t Status: %s\t" %(hostname,'not exist')
+        sys.exit(1)
 
 def hostgroup_get(hostgroupName=''):  
-    group = zabbix.APIobjectMethod(method='hostgroup.get',params={"output": "extend", "filter": { "name": hostgroupName }})
-    if type(group) is list:
-        print "GroupName: %s\t GroupID: %s"% (group[0]['name'],group[0]['groupid'])
-    else:
-        print "GroupName: %s\t GroupID: %s"% (hostgroupName,'does not exist')
+    group_result = zabbix.APIobjectMethod(method='hostgroup.get',params={"output": "extend", "filter": { "name": hostgroupName }})
+    groupid_list=[]
+    if group_result == 'error':
+        print 'group search Error'
+        sys.exit(1)
+    for v in group_result:
+        if len(hostgroupName) == 0:
+            #print "GroupName: %s\t GroupID: %s"% (v['name'],v['groupid'])
+            print "GroupID: \033[32m%s\033[0m \t GroupNAME: \033[31m%s\033[0m \t"%(v['groupid'],v['name'])
+        id=int(v['groupid'])
+        groupid_list.append({'groupid':'%s'%id})
+    return groupid_list
 
 def template_get(template=''):
-    template = zabbix.APIobjectMethod(method='template.get',params={"output":"extend","filter":{"name":template}})
-    for i in template:
-        print i['templateid'],i['host']
-    return template
+    if len(template) > 0:
+        template_list=template.split(',')
+    else:
+        template_list=[]
+    template_result = zabbix.APIobjectMethod(method='template.get',params={"output":"extend","filter":{"name":template_list}})
+    templateid_list=[]
+    if  template_result == 'error':
+        print 'template search Error'
+        sys.exit(1)
+    for i in template_result:
+        if len(template) == 0:
+            print "Template ID: \033[32m%s\033[0m \t Template Name: \033[31m%s\033[0m \t"%(i['templateid'],i['host'])
+        id=int(i['templateid'])
+        templateid_list.append({'templateid':'%s'%id})
+    return templateid_list
 
-def host_create(hostName,hostIP,groupName,template):
-    host = zabbix.APIobjectMethod(method='host.create',params={ 
-                                     "host": hostName, 
-                                     "interfaces": [ 
-                                     { 
-                                     "type": 1, 
-                                     "main": 1, 
-                                     "useip": 1,
-                                     "ip": hostIP ,
-                                     "dns": hostName,
-                                     "port": "10050" 
-                                      } 
-                                     ], 
-                                   "groups": groupName,
-                                   "templates": template})
-    print "添加主机 : \033[42m%s\031[0m \tid :\033[31m%s\033[0m" % (hostip, host['result']['hostids']) 
-
+def host_create(hostIP,hostName,groupName,template):
+    group_list=hostgroup_get(hostgroupName=groupName)
+    template_list=template_get(template=template)
+    params={ "host": hostName,
+             "interfaces": [ 
+                              { 
+                                 "type": 1, 
+                                 "main": 1, 
+                                 "useip": 1,
+                                 "ip": hostIP,
+                                 "dns": hostName,
+                                 "port": "10050" 
+                              } 
+                            ], 
+                "groups": group_list,
+                "templates": template_list
+    }
+    host = zabbix.APIobjectMethod(method='host.create',params=params)
+    if host is not None:
+        print "添加主机 : \033[42m%s\031[0m \tid :\033[31m%s\033[0m" % (hostIP, host['hostids']) 
 
 def hostgroup_create(hostgroupName=''):
     group=zabbix.APIobjectMethod(method='hostgroup.get',params={"output": "extend", "filter": { "name": hostgroupName }})
@@ -65,21 +88,32 @@ def hostgroup_create(hostgroupName=''):
         groupid=int(ret['groupids'][0])
         print "\033[042m 添加主机组:%s\033[0m  hostgroupID : %s"%(hostgroupName,groupid)
 
-def host_delete(hostid):
+def host_delete(hostname=''):
     hostid_list=[]
         #print type(hostid)
-    for i in hostid.split(','):
-        var = {}
-        var['hostid'] = self.host_get(i)
-        hostid_list.append(var)		 
-    data=zabbix.APIobjectMethod(method ='host.delete',params={hostid_list})
-    #print "主机 \033[041m %s\033[0m  已经删除 !"%(hostid_list)
-    #print "主机%s已经删除!"
+    for i in hostname.split(','):
+        hostid=host_get(i)
+        hostid_list.append(hostid)		 
+    #print hostid_list
+    data=zabbix.APIobjectMethod(method ='host.delete',params=hostid_list)
+    if type(data) is not dict:
+        sys.exit(1)
+    for v in data["hostids"]:
+        if v in hostid_list:
+            print "主机 \033[041m %s\033[0m  已经删除 !"%(v)
+        else:
+            print "主机 \033[041m %s\033[0m  已经删除失败 !"%(v)
 
 def host_disable(hostip):
-    host=zabbix.APIobjectMethod(method="host.update",params={"hostid": self.host_get(hostip),"status": 1})
-    #print '----主机现在状态------------'
-    print host_get(hostip)
+    hostid=host_get(hostip)
+    host=zabbix.APIobjectMethod(method="host.update",params={"hostid": hostid,"status": 1})
+    if type(host) is not dict:
+        sys.exit(1)
+    for v in host["hostids"]:
+        print "主机ID \033[041m %s\033[0m  已关闭 !"%(v)
+    #{u'hostids': [10886]}
+    #host_get(hostip)
+    #print host_get(hostip)
 
 def get_items_value(hostid='',item='',startime='',endtime=''):
     #时间转时间戳
@@ -167,8 +201,8 @@ if __name__ == "__main__":
     parser.add_argument('-C','--add-host',dest='addhost',nargs=4,metavar=('10.10.10.1','HostName', 'test01,test02', 'Template01,Template02'),help='添加主机,多个主机组或模板使用分号')
     parser.add_argument('-d','--disable',dest='disablehost',nargs=1,metavar=('10.10.10.1'),help='禁用主机')
     parser.add_argument('-V','--getvalue',dest='getvalue',nargs=4,metavar=('10607','agent.ping','1431331816','1431331816'),help="获取历史数据")
-    parser.add_argument('--get_group_items',dest='get_group_items',nargs=4,metavar=('groupname','itemsname','2015-05-12 00:00:01','2015-05-13 00:00:01'),help='查询主机组的items')
-    parser.add_argument('-D','--delete',dest='deletehost',nargs='+',metavar=('10.10.10.1'),help='删除主机,多个主机之间用分号')
+    parser.add_argument('-N',"--get_group_items_values",dest='get_group_items',nargs=4,metavar=('groupname','itemsname','2015-05-12 00:00:01','2015-05-13 00:00:01'),help='查询主机组的items')
+    parser.add_argument('-D','--delete',dest='deletehost',nargs='+',metavar=('HostName'),help='删除主机,多个主机之间用分号')
     parser.add_argument('-v','--version', action='version', version='%(prog)s 1.0')
     if len(sys.argv)==1:
         print parser.print_help()
@@ -183,7 +217,7 @@ if __name__ == "__main__":
             if args.listgroup:
                 hostgroup_get(args.listgroup)
             else:
-                zabbix.hostgroup_get()
+                hostgroup_get()
         if args.listtemp != 'template':
             if args.listtemp:
                 template_get(args.listtemp)
@@ -201,7 +235,8 @@ if __name__ == "__main__":
             get_items_value(args.getvalue[0],args.getvalue[1],args.getvalue[2],args.getvalue[3])
         if args.get_group_items:
             get_group_items_value(args.get_group_items[0],args.get_group_items[1],args.get_group_items[2],args.get_group_items[3])
-    zabbix.logout()
+#    if zabbix.login():
+#        zabbix.logout()
 
 #python tools.py --getvalue        hostname  system.cpu.util[,iowait] '2015-05-11 18:12:01' '2015-05-12 18:12:01'
 #python tools.py --get_group_items groupname system.cpu.util[,iowait] '2015-05-11 18:12:01' '2015-05-12 18:12:01'
