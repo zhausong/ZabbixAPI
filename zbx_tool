@@ -18,8 +18,8 @@ def host_get(hostname=''):
     status = {"0":"OK","1":"Disabled"}
     available = {"0":"Unknown","1":"available","2":"Unavailable"}
     if host != 'error':
-        host=host[0]
-        print "HostName: %s\t HostID: %s\t Status:\033[32m%s\033[0m \t Available:\033[31m%s\033[0m"%(host['name'],host['hostid'],status[host['status']],available[host['available']])
+	for host in host:
+            print "HostName: %s\t HostID: %s\t Status:\033[32m%s\033[0m \t Available:\033[31m%s\033[0m"%(host['name'],host['hostid'],status[host['status']],available[host['available']])
         hostid=int(host['hostid'])
         return hostid
     else:
