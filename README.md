@@ -3,16 +3,27 @@
 ```
 shell#git clone https://github.com/itnihao/ZabbixAPI.git
 shell#cd ZabbixAPI
+
+#配置用户名、密码：
+#修改ZabbixAPI/__init__.py如下
+self.zabbix_url    = "http://localhost/api_jsonrpc.php"
+self.zabbix_user   = "Admin" 
+self.zabbix_pass   = "zabbix"
+```
+```
+#安装
 shell#sudo python setup.py install
 
+#使用API
 python>import ZabbixAPI
 python>zbx=ZabbixAPI.ZabbixAPI()
 #提供三个方法
 zbx.login()           
 zbx.logout()
 zbx.APIobjectMethod() 
-
-#zbx.APIobjectMethod(method='host.get', params={'output': 'extend'})
+host=zbx.APIobjectMethod(method='host.get', params={'output': 'extend'})
+for h in host:
+    print h['host']
 ```
 如history.get的官方例子用法如下,链接见https://www.zabbix.com/documentation/2.2/manual/api/reference/history/get
 ```
@@ -56,10 +67,4 @@ zbx.APIobjectMethod(method='history.get',"params": {
 ##2.用法
  zbx_tool --help查看帮助 
  
-##3.配置用户名、密码：
-修改ZabbixAPI.py如下
-```
-self.zabbix_url    = "http://localhost/api_jsonrpc.php"
-self.zabbix_user   = "Admin" 
-self.zabbix_pass   = "zabbix"
-```
+
