@@ -31,7 +31,7 @@ shell#sudo python setup.py install
 #使用API
 ```
 python>from ZabbixAPI import  ZabbixAPI
-python>zabbix = ZabbixAPI("https://zabbix.elenet.me")
+python>zabbix = ZabbixAPI("https://zabbix.itnihao.com")
 如果需要执行HTTP Basic认证，请执行auth方法
 python>zabbix.session.auth=(HttpUsername,HttpPassword)
 python>zabbix.login(Username,Password)
