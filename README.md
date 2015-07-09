@@ -3,20 +3,38 @@
 ```
 shell#git clone https://github.com/itnihao/ZabbixAPI.git
 shell#cd ZabbixAPI
-
-#配置用户名、密码：
-#修改ZabbixAPI/__init__.py如下
-self.zabbix_url    = "http://localhost/api_jsonrpc.php"
-self.zabbix_user   = "Admin" 
-self.zabbix_pass   = "zabbix"
-```
-```
 #安装
 shell#sudo python setup.py install
+```
+
+#配置用户名、密码：
+```
+#修改/etc/.zbx_tool.cfg如下
+ #cat /etc/.zbx_tool.cfg
+ [auth]
+ URL=http://zabbix.itnihao.com
+ Username=User
+ Password=Pass
+ [http_auth]
+ HttpUsername=HttpUser
+ HttpPassword=HttpPass
+ 
+ #cat /etc/.zbx_tool.cfg
+ [auth]
+ URL=http://zabbix.itnihao.com
+ Username=User                                                                                                                   Password=Pass
+ [http_auth]
+ HttpUsername=''
+ HttpPassword=''
+```
 
 #使用API
-python>import ZabbixAPI
-python>zbx=ZabbixAPI.ZabbixAPI()
+```
+python>from ZabbixAPI import  ZabbixAPI
+python>zabbix = ZabbixAPI("https://zabbix.elenet.me")
+如果需要执行HTTP Basic认证，请执行auth方法
+python>zabbix.session.auth=(HttpUsername,HttpPassword)
+python>zabbix.login(Username,Password)
 #提供三个方法
 zbx.login()           
 zbx.logout()
