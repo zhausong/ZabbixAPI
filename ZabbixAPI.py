@@ -8,31 +8,28 @@ import json
 import requests
 
 
-class ZabbixAPI(object):
+class ZabbixAPI:
     """docstring for ZabbixAPI"""
-    def __init__(self,server='',session=None,timeout=None):
-        if session:
-            self.session = session
-        else:
-            self.session = requests.Session()
+    def __init__(self):
+        self.zabbix_url = "http://zabbix.elenet.me/api_jsonrpc.php"
+        #self.zabbix_url = "http://localhost/zabbix/api_jsonrpc.php"
+        self.zabbix_header = {
+                              "Content-Type" : "application/json", 
+                              "User-Agent"   : "python/ZabbixAPI" 
+        }
+        self.zabbix_user   = "Admin" 
+        self.zabbix_pass   = "zabbix"
+#        self.auth_code     = ""
 
-        self.session.headers.update({
-            "Content-Type" : "application/json", 
-            "User-Agent"   : "python/ZabbixAPI" 
-        })
-        self.auth_code = ''
-        self.timeout = timeout
-        self.url = server + '/api_jsonrpc.php'
-
-    def login(self,user='',password=''):
+    def login(self):
         params = json.dumps(
                 {
                     "jsonrpc":"2.0",
                     "method":"user.login",
                     "params":
                             {
-                                "user": user,
-                                "password": password,
+                                "user": self.zabbix_user,
+                                "password": self.zabbix_pass,
                             },
                     "id":0
         })
@@ -42,10 +39,11 @@ class ZabbixAPI(object):
             self.check_auth
         except:
             self.check_auth=0
+
         #如果未登录，执行login
         if self.check_auth == 0:
             try:
-                request_zabbix = self.session.post(self.url, data=params,timeout=5)
+                request_zabbix = requests.post(self.zabbix_url, data=params, headers=self.zabbix_header,timeout=5)
             except Exception as e:
                 print e
             else:
@@ -76,7 +74,7 @@ class ZabbixAPI(object):
                 "auth": self.login()
             })
         try:
-            request_zabbix = self.session.post(self.url, data=auth_data, timeout=5)
+            request_zabbix = requests.post(self.zabbix_url, data=auth_data, headers=self.zabbix_header,timeout=5)
         except Exception as e:
             print e
         else:
@@ -101,7 +99,7 @@ class ZabbixAPI(object):
             sys.exit(1)
         if len(self.login()) != 0:
             params = json.dumps(json_data) 
-            request_zabbix = self.session.post(self.url, data=params, timeout=20)
+            request_zabbix = requests.post(self.zabbix_url, data=params, headers=self.zabbix_header,timeout=20)
             request_zabbix.close()
             response = request_zabbix.json()
 

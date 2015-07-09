@@ -2,7 +2,8 @@
 #author: itnihao    
 #date:   2015-05-13 
 
-import ZabbixAPI
+from ZabbixAPI import  ZabbixAPI
+import ConfigParser
 import sys
 import time
 try:
@@ -10,8 +11,42 @@ try:
 except:
     print 'argparse module not exist,you can run pip install argparse'
 
+cfg='/etc/.zbx_tool.cfg'
+config=ConfigParser.ConfigParser()
+config.read(cfg)
+try:
+    Username=config.get("auth","Username")
+    Password=config.get("auth","Password")
+    HttpUsername=config.get("http_auth","HttpUsername")
+    HttpPassword=config.get("http_auth","HttpPassword")
+except:
+    print "Read %s Error "%(cfg)
+    print '''
+    Please Config like this:
+    #cat /etc/.zbx_tool.cfg
+    [auth]
+    URL=http://zabbix.itnihao.com
+    Username=User                                                                                                                                                             
+    Password=Pass
+    [http_auth]
+    HttpUsername=HttpUser
+    HttpPassword=HttpPass
+    
+    #cat /etc/.zbx_tool.cfg
+    [auth]
+    URL=http://zabbix.itnihao.com
+    Username=User                                                                                                                                                             
+    Password=Pass
+    [http_auth]
+    HttpUsername=''
+    HttpPassword=''
+    '''
+    sys.exit(1)
 
-zabbix = ZabbixAPI.ZabbixAPI()
+zabbix = ZabbixAPI("https://zabbix.elenet.me")
+if len(HttpUsername) > 0:
+    zabbix.session.auth=(HttpUsername,HttpPassword)
+zabbix.login(Username,Password)
 
 def host_get(hostname=''): 
     host=zabbix.APIobjectMethod(method='host.get',params={"output":"extend","filter":{"host":hostname}})
@@ -27,7 +62,7 @@ def host_get(hostname=''):
         sys.exit(1)
 
 def hostgroup_get(hostgroupName=''):  
-    group_result = zabbix.APIobjectMethod(method='hostgroup.get',params={"output": "extend", "filter": { "name": hostgroupName }})
+    group_result = zabbix.APIobjectMethod(method='hostgroup.get',params={"output": "extend", "filter": { "name": hostgroupName }}) 
     groupid_list=[]
     if group_result == 'error':
         print 'group search Error'
@@ -82,7 +117,7 @@ def hostgroup_create(hostgroupName=''):
     group=zabbix.APIobjectMethod(method='hostgroup.get',params={"output": "extend", "filter": { "name": hostgroupName }})
     if type(group) is list:
         if 'groupid' in group[0]:
-            print "hostgroupName:\t %s exist,GroupID:\t %s"%(hostgroupName,group['groupid']) 
+            print "hostgroupName:\t %s exist,GroupID:\t %s"%(hostgroupName,group[0]['groupid']) 
     if group == 'error':
         ret=zabbix.APIobjectMethod(method="hostgroup.create",params={"name":hostgroupName}) #
         groupid=int(ret['groupids'][0])
@@ -131,6 +166,7 @@ def get_items_value(hostid='',item='',startime='',endtime=''):
         items=items[0]
         if type(items) is dict:
             itemid=int(items['itemid'])
+	    print items
             item_type=int(items['value_type'])
     else:
         print "item is Error"
@@ -235,8 +271,7 @@ if __name__ == "__main__":
             get_items_value(args.getvalue[0],args.getvalue[1],args.getvalue[2],args.getvalue[3])
         if args.get_group_items:
             get_group_items_value(args.get_group_items[0],args.get_group_items[1],args.get_group_items[2],args.get_group_items[3])
-#    if zabbix.login():
-#        zabbix.logout()
+        zabbix.logout()
 
 #python tools.py --getvalue        hostname  system.cpu.util[,iowait] '2015-05-11 18:12:01' '2015-05-12 18:12:01'
 #python tools.py --get_group_items groupname system.cpu.util[,iowait] '2015-05-11 18:12:01' '2015-05-12 18:12:01'
