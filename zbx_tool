@@ -46,6 +46,7 @@ except:
 zabbix = ZabbixAPI("https://zabbix.elenet.me")
 if len(HttpUsername) > 0:
     zabbix.session.auth=(HttpUsername,HttpPassword)
+    zabbix.session.verify = False
 zabbix.login(Username,Password)
 
 def host_get(hostname=''): 
